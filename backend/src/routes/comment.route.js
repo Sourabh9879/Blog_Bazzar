@@ -4,7 +4,7 @@ const verifyToken = require('../middleware/verifyToken');
 const Comment = require('../model/comment.model');
 
 // Post comment (protected route)
-router.post('/post-comment', verifyToken, async (req, res) => {
+router.post('/post-comment',  async (req, res) => {
     try {
         
         const { comment, postId, user } = req.body;

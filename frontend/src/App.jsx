@@ -1,13 +1,18 @@
-import "./App.css";
+import { Outlet } from 'react-router-dom'
+import './App.css'
+import Navbar from './components/Navbar'
 
 function App() {
   return (
     <>
-      <div className="bg-bgPrimary min-h-screen flex flex-col items-center justify-center">
-        <h1 className="text-5xl font-bold">Hotel Rooftop Starter Files</h1>
+      <div className='bg-bgPrimary min-h-screen flex flex-col'>
+       <Navbar />
+        <div className='flex-grow'>
+          <Outlet />
+        </div>
       </div>
     </>
-  );
+  )
 }
 
-export default App;
+export default App

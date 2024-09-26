@@ -30,7 +30,7 @@ app.use('/api/comments', commentRoutes);
 async function main() {
   await mongoose.connect(process.env.MONGODB_URL);
   app.get('/', (req, res) => {
-    res.send('Hotel Rooftop Server is Running..!');
+    res.send('Blog-Bazzar Server is Running..!');
   });
 }
 

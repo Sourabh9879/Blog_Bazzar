@@ -1,9 +1,10 @@
-# React + Vite
+6:11 api integrate
+6:25 cors add
+6:31 backend
+7:2 editorjs error in SingleBlog Card
+7:31 map func
+7:34 related blog api
+8:12 (optional)
+8:28 token is not saving in local storage
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-# hotel-rooftop-frontend
+for invalid date i have changed only blog.model(15 line) and blog.route(13)
