@@ -21,7 +21,7 @@ PASS = dont use directly your email password instead use App password
 ### Clone the Repo
 
 ```
-https://github.com/Sourabh9879/Blog_Bazzar.git
+git clone https://github.com/Sourabh9879/Blog_Bazzar.git
 ```
 ### Installing
 
