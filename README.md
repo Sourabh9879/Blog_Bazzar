@@ -14,6 +14,8 @@ In the backend > create a .env file and add below details.
 PORT = port no.
 MONGODB_URL = mongoDB url
 JWT_SECRET_KEY = your seceret key
+EMAIL = (your email)through which you want to send otp to the email at time of registering
+PASS = dont use directly your email password instead use App password
 
 ```
 
