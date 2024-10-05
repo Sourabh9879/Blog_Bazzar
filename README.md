@@ -18,7 +18,11 @@ EMAIL = (your email)through which you want to send otp to the email at time of r
 PASS = dont use directly your email password instead use App password
 
 ```
+### Clone the Repo
 
+```
+
+```
 ### Installing
 
 Installing NPM modules on both frontend and backend folders
