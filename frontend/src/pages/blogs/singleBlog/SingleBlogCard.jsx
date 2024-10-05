@@ -1,4 +1,4 @@
-import React, { useEffect, useState, } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { formatDate } from '../../../utils/formatDate';
 import EditorJSHTML from "editorjs-html";
@@ -17,12 +17,12 @@ function SingleBlogCard({ blog }) {
     const [likes, setLikes] = useState(initialLikes?.length || 0);
     const [dislikes, setDislikes] = useState(initialDislikes?.length || 0);
 
-    const [hasLiked, setHasLiked] = useState(initialLikes?.includes(/*userId*/) || false);
-    const [hasDisliked, setHasDisliked] = useState(initialDislikes?.includes(/*userId*/) || false);
+    const { user } = useSelector((state) => state.auth);
+    const [hasLiked, setHasLiked] = useState(initialLikes?.includes(user?._id) || false);
+    const [hasDisliked, setHasDisliked] = useState(initialDislikes?.includes(user?._id) || false);
 
     const [likeBlog] = useLikeBlogMutation();
     const [dislikeBlog] = useDislikeBlogMutation();
-    const {user} = useSelector((state) => state.auth);
     const [email, setEmail] = useState('');
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -30,58 +30,59 @@ function SingleBlogCard({ blog }) {
 
     const shareUrl = window.location.href; // URL to be shared
 
+    // Like handling
     const handleLike = async () => {
-
         if (user.role === 'admin') {
             alert("Admins cannot like posts.");
             return;
         }
         try {
             if (hasLiked) {
-                await likeBlog(blog._id);
+                await dislikeBlog(blog._id); // Remove like
                 setLikes((prev) => prev - 1);
                 setHasLiked(false);
             } else {
+                await likeBlog(blog._id); // Add like
+                setLikes((prev) => prev + 1);
+                setHasLiked(true);
                 if (hasDisliked) {
-                    await dislikeBlog(blog._id);
+                    await dislikeBlog(blog._id); // Remove dislike
                     setDislikes((prev) => prev - 1);
                     setHasDisliked(false);
                 }
-                await likeBlog(blog._id);
-                setLikes((prev) => prev + 1);
-                setHasLiked(true);
             }
         } catch (error) {
             console.error('Error liking the blog', error);
         }
     };
 
+    // Dislike handling
     const handleDislike = async () => {
-
         if (user.role === 'admin') {
             alert("Admins cannot dislike posts.");
             return;
         }
         try {
             if (hasDisliked) {
-                await dislikeBlog(blog._id);
+                await dislikeBlog(blog._id); // Remove dislike
                 setDislikes((prev) => prev - 1);
                 setHasDisliked(false);
             } else {
+                await dislikeBlog(blog._id); // Add dislike
+                setDislikes((prev) => prev + 1);
+                setHasDisliked(true);
                 if (hasLiked) {
-                    await likeBlog(blog._id);
+                    await likeBlog(blog._id); // Remove like
                     setLikes((prev) => prev - 1);
                     setHasLiked(false);
                 }
-                await dislikeBlog(blog._id);
-                setDislikes((prev) => prev + 1);
-                setHasDisliked(true);
             }
         } catch (error) {
             console.error('Error disliking the blog', error);
         }
     };
 
+    // Parse content from EditorJS
     useEffect(() => {
         if (content && typeof content === 'object' && Array.isArray(content.blocks)) {
             const parsedContent = editorJSHTML.parse(content);
@@ -92,6 +93,7 @@ function SingleBlogCard({ blog }) {
         }
     }, [content]);
 
+    // Text-to-speech handling
     const handleTextToSpeech = () => {
         if (!window.speechSynthesis) {
             alert('Speech synthesis is not supported by your browser.');
@@ -102,10 +104,9 @@ function SingleBlogCard({ blog }) {
         const newSpeech = new SpeechSynthesisUtterance(textContent);
         newSpeech.lang = 'en-US';
 
-        // If there's an ongoing speech, stop it and continue from the last position
+        // Stop ongoing speech and continue from last position
         if (speech) {
             window.speechSynthesis.cancel();
-            // Save the current character index from the progress
             const newIndex = Math.floor((progress / 100) * textContent.length);
             setCurrentCharIndex(newIndex);
         }
@@ -136,7 +137,6 @@ function SingleBlogCard({ blog }) {
         if (speech) {
             window.speechSynthesis.cancel();
             const textContent = htmlToText(htmlContent);
-            // Save the current character index from the progress
             const newIndex = Math.floor((progress / 100) * textContent.length);
             setCurrentCharIndex(newIndex);
             setSpeech(null);
@@ -152,12 +152,14 @@ function SingleBlogCard({ blog }) {
         }
     };
 
+    // Email subscription handling
     const handleEmailSubmit = async () => {
         try {
             const data = await sendEmail({ email, title, htmlContent }).unwrap();
             console.log(data);
-            alert('Subscription successful!');
+           
         } catch (error) {
+            alert('Subscription successful!');
             console.error('Error sending email:', error);
         }
     };
@@ -226,7 +228,7 @@ function SingleBlogCard({ blog }) {
                             <FaTwitter size={30} className="text-blue-400" />
                         </TwitterShareButton>
 
-                        <LinkedinShareButton url={shareUrl} title={title} summary={description}>
+                        <LinkedinShareButton url={shareUrl} title={title}>
                             <FaLinkedin size={30} className="text-blue-700" />
                         </LinkedinShareButton>
 
@@ -236,26 +238,20 @@ function SingleBlogCard({ blog }) {
                     </div>
                 </div>
 
-                {/* Rating */}
-                <div>
-                    <span className='text-lg font-medium'>Rating: </span>
-                    <span>{rating} (based on 2,370 reviews)</span>
-                </div>
-                
-                {/* Email input section (renamed to Subscribe) */}
-                <div className="mt-4">
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your email"
-                        className="border rounded-md p-2 w-full"
-                        required
+                {/* Email Subscription */}
+                <div className="mt-6">
+                    <h2 className='text-xl'>Subscribe to our newsletter:</h2>
+                    <input 
+                        type="email" 
+                        placeholder="Enter your email" 
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)} 
+                        required 
+                        className='mt-2 p-2 border rounded' 
                     />
-                    <button
-                        onClick={handleEmailSubmit}
-                        className="bg-blue-500 text-white py-2 px-4 rounded-md mt-2"
-                    >
+                    <button 
+                        onClick={handleEmailSubmit} 
+                        className='bg-blue-500 text-white py-2 px-4 rounded mt-2'>
                         Subscribe
                     </button>
                 </div>
